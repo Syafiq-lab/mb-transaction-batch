@@ -25,4 +25,12 @@ public class TransactionRecord {
 
 	@Version
 	private Integer version;
+
+	@PrePersist
+	@PreUpdate
+	protected void onCreate() {
+		if (version == null) {
+			version = 0; // Initialize version to 0
+		}
+	}
 }

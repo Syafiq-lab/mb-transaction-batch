@@ -32,8 +32,13 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 @Configuration
@@ -55,7 +60,6 @@ public class BatchConfig {
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
 
-	// Constructor with HasErrorsListener injection
 	public BatchConfig(DataSource dataSource, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
 		this.dataSource = dataSource;
 		this.jobRepository = jobRepository;
@@ -80,7 +84,6 @@ public class BatchConfig {
 		BeanWrapperFieldSetMapper<TransactionRecord> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
 		fieldSetMapper.setTargetType(TransactionRecord.class);
 
-		// Register custom converters
 		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
 		conversionService.addConverter(new StringToLocalDateConverter());
 		conversionService.addConverter(new StringToLocalTimeConverter());
@@ -109,6 +112,12 @@ public class BatchConfig {
 			} catch (NumberFormatException e) {
 				throw new InvalidTransactionRecordException("Invalid number format in record: " + transactionRecord);
 			}
+
+			// Initialize version if null
+			if (transactionRecord.getVersion() == null) {
+				transactionRecord.setVersion(0);  // Set the initial version to 0
+			}
+
 			return transactionRecord;
 		};
 	}
@@ -119,8 +128,8 @@ public class BatchConfig {
 		return new JdbcBatchItemWriterBuilder<TransactionRecord>()
 				.dataSource(dataSource)
 				.beanMapped()
-				.sql("INSERT INTO transaction_record (account_number, trx_amount, description, trx_date, trx_time, customer_id) " +
-						"VALUES (:accountNumber, :trxAmount, :description, :trxDate, :trxTime, :customerId)")
+				.sql("INSERT INTO transaction_record (account_number, trx_amount, description, trx_date, trx_time, customer_id, version) " +
+						"VALUES (:accountNumber, :trxAmount, :description, :trxDate, :trxTime, :customerId, :version)")
 				.build();
 	}
 
@@ -194,7 +203,6 @@ public class BatchConfig {
 		};
 	}
 
-
 	private Resource[] getResources(String directoryPath) {
 		logger.info("Fetching files from directory: {}", directoryPath);
 		File folder = new File(directoryPath);
@@ -210,4 +218,5 @@ public class BatchConfig {
 				.map(FileSystemResource::new)
 				.toArray(Resource[]::new);
 	}
+
 }
