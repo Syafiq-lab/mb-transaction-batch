@@ -1,6 +1,6 @@
-package com.mybank.transactionbatchprocessor;
+package com.mb.transactionbatchprocessor;
 
-import com.mybank.transactionbatchprocessor.batch.FileMovingTasklet;
+import com.mb.transactionbatchprocessor.batch.FileMovingTasklet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

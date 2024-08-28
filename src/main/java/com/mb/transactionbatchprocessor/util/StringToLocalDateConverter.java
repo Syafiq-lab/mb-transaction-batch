@@ -1,4 +1,4 @@
-package com.mybank.transactionbatchprocessor.util;
+package com.mb.transactionbatchprocessor.util;
 
 import org.springframework.core.convert.converter.Converter;
 

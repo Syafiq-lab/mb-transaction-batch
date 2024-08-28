@@ -1,4 +1,4 @@
-package com.mybank.transactionbatchprocessor;
+package com.mb.transactionbatchprocessor;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

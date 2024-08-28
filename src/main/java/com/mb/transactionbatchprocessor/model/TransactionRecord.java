@@ -1,4 +1,4 @@
-package com.mybank.transactionbatchprocessor.model;
+package com.mb.transactionbatchprocessor.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

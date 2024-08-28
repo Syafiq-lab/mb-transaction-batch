@@ -1,9 +1,9 @@
-package com.mybank.transactionbatchprocessor.batch;
+package com.mb.transactionbatchprocessor.batch;
 
-import com.mybank.transactionbatchprocessor.exception.InvalidTransactionRecordException;
-import com.mybank.transactionbatchprocessor.model.TransactionRecord;
-import com.mybank.transactionbatchprocessor.util.StringToLocalDateConverter;
-import com.mybank.transactionbatchprocessor.util.StringToLocalTimeConverter;
+import com.mb.transactionbatchprocessor.exception.InvalidTransactionRecordException;
+import com.mb.transactionbatchprocessor.model.TransactionRecord;
+import com.mb.transactionbatchprocessor.util.StringToLocalDateConverter;
+import com.mb.transactionbatchprocessor.util.StringToLocalTimeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
@@ -32,13 +32,8 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Arrays;
 
 @Configuration

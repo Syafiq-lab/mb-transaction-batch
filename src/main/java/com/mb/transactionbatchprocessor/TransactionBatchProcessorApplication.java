@@ -1,4 +1,4 @@
-package com.mybank.transactionbatchprocessor;
+package com.mb.transactionbatchprocessor;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;

@@ -165,7 +165,7 @@ mvn spring-boot:run
 ## Step 5: Verify the Results
 After running the application, the processed transaction data should be available in the transaction_record table in your MySQL database. The input files should be moved to the Completed directory.
 
-## Class Diagram
+## Activity Diagram
 
 ```mermaid
 sequenceDiagram
@@ -185,22 +185,45 @@ sequenceDiagram
     BatchConfig->>Reader: Step 1: Read files
     Reader-->>Processor: Pass records for processing
 
-    Processor->>Processor: Validate record
-    alt Valid record
+    alt Valid Data
         Processor-->>Writer: Pass valid records for writing
-    else Invalid record
-        Processor->>SkipListener: Detect invalid data and skip record
-        SkipListener->>Processor: Log skipped record (invalid data)
-        SkipListener->>BatchConfig: Mark file as error
+        Writer-->>BatchConfig: Write valid records to database
+    else Invalid Data
+        Processor->>SkipListener: Handle invalid records (log errors, write to error file)
+        SkipListener-->>BatchConfig: Skip record, continue processing
     end
 
-    Writer-->>BatchConfig: Write valid records to database
-    BatchConfig->>MoveFilesStep: Move processed files
-    MoveFilesStep-->>BatchConfig: Files moved
+    BatchConfig->>MoveFilesStep: Move processed files (based on error status)
+    MoveFilesStep-->>BatchConfig: Files moved to completed/error directory
     BatchConfig->>JobCompletion: Notify job completion
     JobCompletion-->>User: Job status (COMPLETED/FAILED)
     JobCompletion->>CustomListener: Log job results (success/failure)
     CustomListener-->>User: Log summary
 
-
 ```
+
+# Design Patterns
+## 1. Job Configuration (Builder Pattern):
+- The BatchConfig class uses the Builder Pattern extensively for configuring and constructing batch jobs, steps, readers, processors, and writers. 
+  - Example:
+    - The JobBuilder, StepBuilder, FlatFileItemReaderBuilder, and JdbcBatchItemWriterBuilder are used to fluently construct jobs and steps.
+    
+## 2. Template Method Pattern:
+- The Template Method Pattern is applied in the Spring Batch framework itself, where the structure of the job is defined by the framework, but specific steps (reading, processing, writing) are implemented in the BatchConfig. 
+  - Example:
+    - You define how records are read, processed, and written in the batch steps, while the overall execution flow is managed by the Spring Batch framework.
+
+## 3. Strategy Pattern:
+- The Strategy Pattern is applied in the way you can define multiple strategies (readers, processors, writers) for handling various types of inputs and outputs. 
+  - Example:
+    - The transactionRecordProcessor, multiResourceItemReader, and transactionRecordWriter are interchangeable components that can be customized based on specific processing needs.
+
+## 4. Observer Pattern:
+- The Observer Pattern is used with listeners like JobCompletionNotificationListener and CustomJobExecutionListener, which observe the state of the job execution and act upon its completion or failure. 
+  - Example:
+    - These listeners are notified when the job is completed, and they log the outcome or perform additional tasks.
+
+## 5. Decorator Pattern:
+- The Decorator Pattern is seen in the way fault-tolerant mechanisms like skip and retry are added to the job steps without altering the core processing logic. 
+  - Example:
+    - The faultTolerant() method in StepBuilder decorates the existing step with fault tolerance capabilities, allowing for error handling like skipping or retrying failed records.

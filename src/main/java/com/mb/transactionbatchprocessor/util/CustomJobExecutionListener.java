@@ -1,4 +1,4 @@
-package com.mybank.transactionbatchprocessor.util;
+package com.mb.transactionbatchprocessor.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.mybank.transactionbatchprocessor.aspect;
+package com.mb.transactionbatchprocessor.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -17,7 +17,7 @@ public class LoggingAspect {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-	@Pointcut("execution(* com.mybank.transactionbatchprocessor..*(..)) && !execution(* com.mybank.transactionbatchprocessor.batch.BatchConfig.transactionRecordProcessor(..)) && !execution(* com.mybank.transactionbatchprocessor.batch.BatchConfig.process(..))")
+	@Pointcut("execution(* com.mb.transactionbatchprocessor..*(..)) && !execution(* com.mb.transactionbatchprocessor.batch.BatchConfig.transactionRecordProcessor(..)) && !execution(* com.mb.transactionbatchprocessor.batch.BatchConfig.process(..))")
 	public void applicationPackagePointcut() {
 	}
 
