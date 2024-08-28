@@ -1,0 +1,112 @@
+@startuml
+class com.mybank.transactionbatchprocessor.TransactionBatchProcessorApplication {
+- JobLauncher jobLauncher
+- Job importTransactionRecordJob
++ {static} void main(String[])
++ void run(String)
+}
+
+
+class com.mybank.transactionbatchprocessor.TransactionBatchProcessorApplicationTests {
+~ void contextLoads()
+}
+
+class com.mybank.transactionbatchprocessor.batch.BatchConfig {
+- {static} Logger logger
+- String inputDir
+- String completedDir
+- String errorDir
+- DataSource dataSource
+- JobRepository jobRepository
+- PlatformTransactionManager transactionManager
++ MultiResourceItemReader<TransactionRecord> multiResourceItemReader()
++ FlatFileItemReader<TransactionRecord> transactionRecordReader()
++ ItemProcessor<TransactionRecord,TransactionRecord> transactionRecordProcessor()
++ ItemWriter<TransactionRecord> transactionRecordWriter()
++ Job importTransactionRecordJob(JobCompletionNotificationListener,Step,Step)
++ Step step1()
++ Step moveFilesStep()
++ SkipListener<TransactionRecord,TransactionRecord> skipListener()
+- Resource[] getResources(String)
+}
+
+
+class com.mybank.transactionbatchprocessor.FileMovingTaskletTests {
+- {static} String TEST_INPUT_DIR
+- {static} String TEST_COMPLETED_DIR
+- {static} String TEST_ERROR_DIR
+- FileMovingTasklet fileMovingTasklet
+~ void setUp()
+~ void tearDown()
+- Path getCompletedFilePath(String)
+~ void testEmptyFile()
+~ void testFileWithIncorrectFormat()
+~ void testSuccessfulJobExecution()
+~ void testFileMovementFailure()
+}
+
+
+class com.mybank.transactionbatchprocessor.util.StringToLocalDateConverter {
++ LocalDate convert(String)
+}
+
+class com.mybank.transactionbatchprocessor.batch.JobCompletionNotificationListener {
+- {static} Logger logger
++ void afterJob(JobExecution)
+}
+
+
+class com.mybank.transactionbatchprocessor.exception.InvalidTransactionRecordException {
+}
+class com.mybank.transactionbatchprocessor.batch.FileMovingTasklet {
+- {static} Logger logger
+- String inputDir
+- String completedDir
+- String errorDir
++ RepeatStatus execute(StepContribution,ChunkContext)
+- void createDirectoryIfNotExists(String)
+}
+
+
+class com.mybank.transactionbatchprocessor.aspect.LoggingAspect {
+- {static} Logger logger
++ void applicationPackagePointcut()
++ void logBefore(JoinPoint)
++ void logAfterReturning(JoinPoint,Object)
+}
+
+
+class com.mybank.transactionbatchprocessor.util.StringToLocalTimeConverter {
++ LocalTime convert(String)
+}
+
+class com.mybank.transactionbatchprocessor.util.CustomJobExecutionListener {
+- {static} Logger logger
++ void beforeJob(JobExecution)
++ void afterJob(JobExecution)
+}
+
+
+class com.mybank.transactionbatchprocessor.model.TransactionRecord {
+- Long id
+- String accountNumber
+- Double trxAmount
+- String description
+- LocalDate trxDate
+- LocalTime trxTime
+- String customerId
+- Integer version
+# void onCreate()
+}
+
+
+
+
+org.springframework.boot.CommandLineRunner <|.. com.mybank.transactionbatchprocessor.TransactionBatchProcessorApplication
+org.springframework.core.convert.converter.Converter <|.. com.mybank.transactionbatchprocessor.util.StringToLocalDateConverter
+org.springframework.batch.core.listener.JobExecutionListenerSupport <|-- com.mybank.transactionbatchprocessor.batch.JobCompletionNotificationListener
+com.mybank.transactionbatchprocessor.exception.RuntimeException <|-- com.mybank.transactionbatchprocessor.exception.InvalidTransactionRecordException
+org.springframework.batch.core.step.tasklet.Tasklet <|.. com.mybank.transactionbatchprocessor.batch.FileMovingTasklet
+org.springframework.core.convert.converter.Converter <|.. com.mybank.transactionbatchprocessor.util.StringToLocalTimeConverter
+org.springframework.batch.core.JobExecutionListener <|.. com.mybank.transactionbatchprocessor.util.CustomJobExecutionListener
+@enduml

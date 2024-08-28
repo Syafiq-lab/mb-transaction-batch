@@ -164,3 +164,43 @@ mvn spring-boot:run
 
 ## Step 5: Verify the Results
 After running the application, the processed transaction data should be available in the transaction_record table in your MySQL database. The input files should be moved to the Completed directory.
+
+## Class Diagram
+
+```mermaid
+sequenceDiagram
+    participant User as User/CommandLineRunner
+    participant JobLauncher as JobLauncher
+    participant BatchConfig as BatchConfig
+    participant Reader as multiResourceItemReader
+    participant Processor as transactionRecordProcessor
+    participant Writer as transactionRecordWriter
+    participant SkipListener as skipListener
+    participant MoveFilesStep as moveFilesStep
+    participant JobCompletion as JobCompletionNotificationListener
+    participant CustomListener as CustomJobExecutionListener
+
+    User->>JobLauncher: Trigger importTransactionRecordJob
+    JobLauncher->>BatchConfig: Start Job (importTransactionRecordJob)
+    BatchConfig->>Reader: Step 1: Read files
+    Reader-->>Processor: Pass records for processing
+
+    Processor->>Processor: Validate record
+    alt Valid record
+        Processor-->>Writer: Pass valid records for writing
+    else Invalid record
+        Processor->>SkipListener: Detect invalid data and skip record
+        SkipListener->>Processor: Log skipped record (invalid data)
+        SkipListener->>BatchConfig: Mark file as error
+    end
+
+    Writer-->>BatchConfig: Write valid records to database
+    BatchConfig->>MoveFilesStep: Move processed files
+    MoveFilesStep-->>BatchConfig: Files moved
+    BatchConfig->>JobCompletion: Notify job completion
+    JobCompletion-->>User: Job status (COMPLETED/FAILED)
+    JobCompletion->>CustomListener: Log job results (success/failure)
+    CustomListener-->>User: Log summary
+
+
+```
