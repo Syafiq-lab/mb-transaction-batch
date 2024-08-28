@@ -131,11 +131,11 @@ The application uses the application.properties file to configure the database c
 
 ```properties
 # Define the external directory paths
-transaction.input.dir=C:/project/iv/maybank/Input
-transaction.completed.dir=C:/project/iv/maybank/Input/Completed
+transaction.input.dir= "your dir"
+transaction.completed.dir= "your dir"
 
 # Database configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/maybank_test
+spring.datasource.url=jdbc:mysql://localhost:3306/"your db"
 spring.datasource.username=root
 spring.datasource.password=your_password
 
